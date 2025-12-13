@@ -12,7 +12,15 @@
       {{- $uri = .Permalink -}}
     {{- end -}}
     {{- $meta := dict "uri" $uri "title" .Title "tags" .Params.tags "categories" .Params.categories "collections" .Params.collections -}}
-    {{- $meta = $.Site.Params.dateFormat | default "2006-01-02" | .PublishDate.Format | dict "date" | merge $meta -}}
+    {{- $year := "forthcoming" -}}
+    {{- with .Params.year -}}
+      {{- $year = printf "%v" . -}}
+    {{- else -}}
+      {{- if not .PublishDate.IsZero -}}
+        {{- $year = .PublishDate.Format "2006" -}}
+      {{- end -}}
+    {{- end -}}
+    {{- $meta = dict "date" $year | merge $meta -}}
     {{- with .Description -}}
       {{- $index = $index | append (dict "content" . "objectID" $uri | merge $meta) -}}
     {{- end -}}

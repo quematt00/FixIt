@@ -6,52 +6,11 @@
       {{- /*  Custom Footer */ -}}
       {{- block "custom-footer" . }}{{ end -}}
 
-      {{- /* Powered by Hugo and Theme - FixIt */ -}}
-      {{- if ne $footerConfig.powered.enable false -}}
-        <div class="footer-line powered{{ with $footerConfig.order.powered }} order-{{ . }}{{ end }}">
-          {{- $hugo := printf `<a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo %v">{hugoLogo}Hugo</a>` hugo.Version -}}
-          {{- $theme := printf `<a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt %v">{themeLogo}FixIt</a>` (hugo.Store.Get "version") -}}
-          {{- if $footerConfig.powered.hugoLogo -}}
-          {{- $hugoLogo := printf `<img class="hugo-icon" src="%v" alt="Hugo logo" /> ` (resources.Get "images/hugo.svg" | minify).RelPermalink -}}
-            {{- $hugo = replace $hugo "{hugoLogo}" $hugoLogo -}}
-          {{- end -}}
-          {{- if $footerConfig.powered.themeLogo -}}
-            {{- $themeLogo := printf `<img class="fixit-icon" src="%v" alt="FixIt logo" /> ` (resources.Get "images/fixit.svg" | minify).RelPermalink -}}
-            {{- $theme = replace $theme "{themeLogo}" $themeLogo -}}
-          {{- end -}}
-          {{- $hugo = replace $hugo "{hugoLogo}" "" -}}
-          {{- $theme = replace $theme "{themeLogo}" "" -}}
-          {{- dict "Hugo" $hugo "Theme" $theme | T "footer.poweredBySome" | safeHTML }}
-        </div>
-      {{- end -}}
-
-      {{- if $footerConfig.copyright | or $footerConfig.author | or $footerConfig.license -}}
-        <div class="footer-line copyright{{ with $footerConfig.order.copyright }} order-{{ . }}{{ end }}" itemscope itemtype="http://schema.org/CreativeWork">
-          {{- /* Copyright year */ -}}
-          {{- if ne $footerConfig.copyright false -}}
-            {{ dict "Class" "fa-regular fa-copyright fa-fw" | partial "plugin/icon.html" }}
-            {{ with $footerConfig.since -}}
-              <span itemprop="copyrightYear">
-                {{- if lt . now.Year }}{{ . }} - {{ end }}{{ now.Year -}}
-              </span>
-            {{- else -}}
-              <span itemprop="copyrightYear">{{ now.Year }}</span>
-            {{- end -}}
-          {{- end -}}
-
-          {{- /* Author */ -}}
-          {{- if ne $footerConfig.author false -}}
-            <span class="author" itemprop="copyrightHolder">
-              {{ partial "plugin/link.html" (dict "Destination" ($.Site.Params.author.link | default (relLangURL "")) "Content" .Site.Params.author.name) -}}
-            </span>
-          {{- end -}}
-
-          {{- /* License */ -}}
-          {{- with $footerConfig.license -}}
-            <span class="license footer-divider">{{ . | safeHTML }}</span>
-          {{- end -}}
-        </div>
-      {{- end -}}
+      <div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork">
+        {{ dict "Class" "fa-regular fa-copyright fa-fw" | partial "plugin/icon.html" }}
+        <span itemprop="copyrightYear">{{ now.Year }}</span>
+        <span class="author" itemprop="copyrightHolder">Matthieu Queloz</span>
+      </div>
 
       {{- $siteTime := .Site.Store.Get "siteTime" -}}
       {{- if $siteTime.enable -}}

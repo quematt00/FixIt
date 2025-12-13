@@ -85,6 +85,25 @@ class FixIt {
         this.querySelector('.dropdown-icon').classList.toggle('open');
       });
     });
+
+    const $mobileLanguageSwitch = document.querySelector('#header-mobile .header-wrapper .language-switch');
+    if ($mobileLanguageSwitch) {
+      const $toggle = $mobileLanguageSwitch.querySelector(':scope > span[role="button"]');
+      const $subMenu = $mobileLanguageSwitch.querySelector(':scope > .sub-menu');
+      if ($toggle && $subMenu) {
+        const close = () => $subMenu.classList.remove('open');
+        $toggle.addEventListener('click', (event) => {
+          event.stopPropagation();
+          $subMenu.classList.toggle('open');
+        }, false);
+        document.addEventListener('click', (event) => {
+          if (!$mobileLanguageSwitch.contains(event.target)) {
+            close();
+          }
+        }, false);
+        this.resizeEventSet.add(close);
+      }
+    }
   }
 
   initSwitchTheme() {
@@ -149,7 +168,7 @@ class FixIt {
     const location = searchConfig.location ?? 0;
     const threshold = searchConfig.threshold ?? 0.3;
     const distance = searchConfig.distance ?? 100;
-    const ignoreLocation = searchConfig.ignoreLocation ?? false;
+    const ignoreLocation = searchConfig.ignoreLocation ?? true;
     const useExtendedSearch = searchConfig.useExtendedSearch ?? false;
     const ignoreFieldNorm = searchConfig.ignoreFieldNorm ?? false;
     const suffix = isMobile ? 'mobile' : 'desktop';
@@ -314,7 +333,7 @@ class FixIt {
                       includeScore: false,
                       shouldSort: true,
                       includeMatches: true,
-                      keys: ['content', 'title']
+                      keys: ['content', 'title', 'tags']
                     };
                     window._index = new Fuse(data, options);
                     finish(search());
@@ -880,8 +899,8 @@ class FixIt {
   initTypeit(target = document) {
     if (this.config.typeit) {
       const typeitConfig = this.config.typeit;
-      const speed = typeitConfig.speed || 100;
-      const cursorSpeed = typeitConfig.cursorSpeed || 1000;
+      const speed = typeitConfig.speed || 10;
+      const cursorSpeed = typeitConfig.cursorSpeed || 400;
       const cursorChar = typeitConfig.cursorChar || '|';
       const loop = typeitConfig.loop ?? false;
       // divide them into different groups according to the data-group attribute value of the element
@@ -917,6 +936,10 @@ class FixIt {
             waitUntilVisible: true,
             loop: singleData.loop ? singleData.loop === 'true' : loop,
             afterComplete: () => {
+              const cursor = typeitElement.querySelector('.ti-cursor');
+              if (cursor) {
+                cursor.style.display = 'none';
+              }
               const duration = Number(singleData.duration ?? typeitConfig.duration);
               if (i === group.length - 1) {
                 if (duration >= 0) {

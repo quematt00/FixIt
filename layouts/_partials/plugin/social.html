@@ -1,11 +1,40 @@
-{{- $destination := "" -}}
-{{- with .Url -}}
-  {{- $destination = . | relLangURL -}}
-{{- else -}}
-  {{- $template := .Template | default "%v" -}}
-  {{- with .Prefix -}}
-    {{- $template = . | strings.TrimSuffix "/" | printf "%v/%%v" -}}
+{{- if eq (lower .Title) "email" -}}
+  {{- $address := .Id | default "" -}}
+  {{- if $address -}}
+    {{- $b64 := $address | base64Encode -}}
+    <a href="#"
+       class="{{ .Class }}"
+       title="{{ .Title }}"
+       data-enc="{{ $b64 }}"
+       onclick="window.location.href='mailto:' + atob(this.dataset.enc); return false;"
+       rel="me">
+      {{- with .Icon -}}
+        {{- partial "plugin/icon.html" . -}}
+      {{- end -}}
+      {{- with .Content -}}
+        {{- . | safeHTML -}}
+      {{- end -}}
+    </a>
   {{- end -}}
-  {{- $destination = printf (string $template) .Id -}}
+{{- else -}}
+  {{- $destination := "" -}}
+  {{- with .Url -}}
+    {{- $destination = . | relLangURL -}}
+  {{- else -}}
+    {{- $template := .Template | default "%v" -}}
+    {{- with .Prefix -}}
+      {{- $template = . | strings.TrimSuffix "/" | printf "%v/%%v" -}}
+    {{- end -}}
+    {{- $target := .Id -}}
+    {{- if and (eq (lower .Title) "email") (strings.Contains $template "mailto:") -}}
+      {{- $pieces := split .Id "@" -}}
+      {{- if eq (len $pieces) 2 -}}
+        {{- $user := index $pieces 0 -}}
+        {{- $domain := index $pieces 1 -}}
+        {{- $target = printf "%s@%s" $user $domain | urlquery -}}
+      {{- end -}}
+    {{- end -}}
+    {{- $destination = printf (string $template) $target -}}
+  {{- end -}}
+  {{- dict "Destination" $destination "Rel" "me" | merge . | partial "plugin/link.html" -}}
 {{- end -}}
-{{- dict "Destination" $destination "Rel" "me" | merge . | partial "plugin/link.html" -}}

@@ -1,5 +1,6 @@
 {{- $buildDrafts := .Site.BuildDrafts -}}
 {{- $relLangURL := relLangURL "" -}}
+{{- $defaultLang := "en" -}}
 
 {{- /* Desktop header */ -}}
 <header class="desktop animate__faster" id="header-desktop">
@@ -114,7 +115,7 @@
         {{- if hugo.IsMultilingual -}}
           <li class="menu-item language-switch">
             <span role="button" aria-label="{{ T "header.selectLanguage" }}" title="{{ T "header.selectLanguage" }}">
-              {{- dict "Class" "fa-solid fa-language fa-fw" | partial "plugin/icon.html" -}}
+              {{- dict "Class" "fa-solid fa-globe fa-fw" | partial "plugin/icon.html" -}}
             </span>
             <ul class="sub-menu">
               {{- if (eq .Kind "404") -}}
@@ -128,18 +129,20 @@
                     </li>
                   {{- end -}}
                 {{- end -}}
-              {{- else if .IsTranslated -}}
-                {{- range .AllTranslations -}}
+              {{- else -}}
+                {{- range .Site.Languages -}}
                   <li class="menu-item">
-                    {{- if ne .Lang $.Lang -}}
-                      <a href="{{ .RelPermalink }}" class="menu-link" title="{{ .Language.LanguageName }}">{{ .Language.LanguageName }}</a>
+                    {{- $target := "/" -}}
+                    {{- if ne .Lang $defaultLang -}}
+                      {{- $target = printf "/%s/" .Lang -}}
+                    {{- end -}}
+                    {{- if eq .Lang $.Lang -}}
+                      <span class="text-secondary" title="{{ .LanguageName }}">{{ .LanguageName }}</span>
                     {{- else -}}
-                      <span class="text-secondary" title="{{ .Language.LanguageName }}">{{ .Language.LanguageName }}</span>
+                      <a href="{{ $target }}" class="menu-link" title="{{ .LanguageName }}">{{ .LanguageName }}</a>
                     {{- end -}}
                   </li>
                 {{- end -}}
-              {{- else -}}
-                <li class="menu-item">{{- T "header.noMoretTranslations" -}}</li>
               {{- end -}}
             </ul>
           </li>
@@ -190,6 +193,28 @@
       <div class="theme-switch" role="button" aria-label="{{ T "header.switchTheme" }}">
         {{- dict "Class" "fa-solid fa-adjust fa-fw" | partial "plugin/icon.html" -}}
       </div>
+      {{- if hugo.IsMultilingual -}}
+      <div class="language-switch">
+        <span role="button" aria-label="{{ T "header.selectLanguage" }}" title="{{ T "header.selectLanguage" }}">
+          {{- dict "Class" "fa-solid fa-globe fa-fw" | partial "plugin/icon.html" -}}
+        </span>
+        <ul class="sub-menu">
+          {{- range .Site.Languages -}}
+            <li class="menu-item">
+              {{- $target := "/" -}}
+              {{- if ne .Lang $defaultLang -}}
+                {{- $target = printf "/%s/" .Lang -}}
+              {{- end -}}
+              {{- if eq .Lang $.Lang -}}
+                <span class="text-secondary" title="{{ .LanguageName }}">{{ .LanguageName }}</span>
+              {{- else -}}
+                <a href="{{ $target }}" class="menu-link" title="{{ .LanguageName }}">{{ .LanguageName }}</a>
+              {{- end -}}
+            </li>
+          {{- end -}}
+        </ul>
+      </div>
+      {{- end -}}
       <div class="menu-toggle" id="menu-toggle-mobile" role="button" aria-labelledby="menu-mobile">
         <span></span><span></span><span></span>
       </div>
